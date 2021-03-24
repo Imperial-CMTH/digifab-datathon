@@ -38,7 +38,7 @@ features = pd.concat([
 
 data = pd.read_csv('./data/train_crystals.csv')
 # %% Train / test splitting
-target = data['packing_coefficient']
+target = data['spacegroup_symbol']
 
 X_train, X_test, y_train, y_test = train_test_split(
     features, target, test_size=0.33, random_state=42)
@@ -49,15 +49,15 @@ y_train = y_train.to_numpy()
 pclf = Pipeline([
     ('imputer', SimpleImputer(strategy='mean', verbose=1)),
     ('scaler', MinMaxScaler()),
-    ('feature_sel', SelectKBest(f_regression, k = 300)),
-    ('fitting', KernelRidge())
+    ('feature_sel', SelectKBest(chi2, k = 200)),
+    ('fitting', RandomForestClassifier(random_state=0))
 ])
 # %% Fitting
 pclf.fit(X_train, y_train)
 
 # %% Prediction
 y_pred = pclf.predict(X_test)
-print('mean_absolute_error: ', mean_absolute_error(y_test, y_pred))
+print('f1 score: ', f1_score(y_test, y_pred, average = 'macro'))
 # %% testing
 
 test_csvs = glob.glob("./data/test_*.csv")
@@ -70,8 +70,10 @@ test_data = pd.concat([
     tests['test_mol2vec'],
     ], axis = 1)
 
+
 pclf.fit(features, target)
 test_pred = pclf.predict(test_data)
 # %% saving
-np.savetxt('./out/bonus_1_predictions.csv', test_pred)
+print(test_pred)
+open('./out/bonus_3_predictions.csv','w').write("\n".join(test_pred))
 # %%

@@ -70,7 +70,7 @@ test_data = pd.concat([
     tests['test_mol2vec'],
     ], axis = 1)
 
-
+pclf.fit(features, target)
 test_pred = pclf.predict(test_data)
 #%% saving
 with open('./out/task_2_predictions.csv', 'w') as f:
