@@ -130,3 +130,4 @@ dmypy.json
 # Pyre type checker
 .pyre/
 out/task_2_predictions.csv
+out/bonus_3_predictions.csv

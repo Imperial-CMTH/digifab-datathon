@@ -53,8 +53,7 @@ pclf = Pipeline([
     ('imputer', SimpleImputer(strategy='mean', verbose=1)),
     ('scaler', MinMaxScaler()),
     ('feature_sel', SelectKBest(chi2, k = 100)),
-    #('fitting', RandomForestClassifier(random_state=0)),
-    ('fitting', RadiusNeighborsClassifier(radius = 50))
+    ('fitting', RandomForestClassifier(random_state=0, n_estimators = 1000)),
 ])
 # %% Fitting
 pclf.fit(X_train, y_train)
