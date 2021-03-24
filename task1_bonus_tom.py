@@ -31,14 +31,14 @@ def read_descriptors(path):
 
 features = pd.concat([
     read_descriptors('./data/train_descriptors.csv'),
-    #train['train_rdk'].drop('0', axis = 1),
+    train['train_rdk'].drop('0', axis = 1),
     train['train_mord3d'].drop(['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'smiles'], axis = 1),
-    #train['train_mol2vec'],
+    train['train_mol2vec'],
     ], axis = 1)
 
 data = pd.read_csv('./data/train_crystals.csv')
 # %% Train / test splitting
-target = data['is_centrosymmetric']
+target = data['packing_coefficient']
 
 X_train, X_test, y_train, y_test = train_test_split(
     features, target, test_size=0.33, random_state=42)
@@ -49,30 +49,29 @@ y_train = y_train.to_numpy()
 pclf = Pipeline([
     ('imputer', SimpleImputer(strategy='mean', verbose=1)),
     ('scaler', MinMaxScaler()),
-    ('feature_sel', SelectKBest(chi2, k = 50)),
-    ('fitting', RandomForestClassifier(random_state=0))
+    ('feature_sel', SelectKBest(f_regression, k = 300)),
+    ('fitting', KernelRidge())
 ])
 # %% Fitting
 pclf.fit(X_train, y_train)
 
 # %% Prediction
 y_pred = pclf.predict(X_test)
-print('f1 score: ', f1_score(y_test, y_pred, average = 'macro'))
-# %% testing     
+print('mean_absolute_error: ', mean_absolute_error(y_test, y_pred))
+# %% testing
 
 test_csvs = glob.glob("./data/test_*.csv")
 tests = {Path(t).stem : pd.read_csv(t) for t in test_csvs}
 
 test_data = pd.concat([
     read_descriptors('./data/test_descriptors.csv'),
-    #tests['test_rdk'].drop('0', axis = 1),
+    tests['test_rdk'].drop('0', axis = 1),
     tests['test_mord3d'].drop(['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'smiles'], axis = 1),
-    #tests['test_mol2vec'],
+    tests['test_mol2vec'],
     ], axis = 1)
 
 pclf.fit(features, target)
 test_pred = pclf.predict(test_data)
-#%% saving
-with open('./out/task_2_predictions.csv', 'w') as f:
-    f.write("\n".join('True' if i else 'False' for i in test_pred))
+# %% saving
+np.savetxt('./out/bonus_1_predictions.csv', test_pred)
 # %%
