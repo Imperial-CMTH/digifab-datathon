@@ -14,17 +14,17 @@ from sklearn.ensemble import ExtraTreesClassifier
 from sklearn.kernel_ridge import KernelRidge
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
-from sklearn.metrics import mean_absolute_error
+from sklearn.metrics import mean_absolute_error, f1_score
 from sklearn.svm import SVR
 
 from sklearn.ensemble import RandomForestClassifier
 
-def read_data(path):
-        feature_headers = [*pd.read_csv('./data/train_descriptors.csv', nrows=1)]
-        features = pd.read_csv(
-            './data/train_descriptors.csv',
-            usecols=[c for c in headers if not c in ['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'SMILES']]
-data = pd.read_csv('../data/train_crystals.csv')
+def read_descriptors(path):
+        headers = [*pd.read_csv(path, nrows=1)]
+        return pd.read_csv(path, usecols=[c for c in headers if not c in ['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'SMILES']])
+
+features = read_descriptors('./data/train_descriptors.csv')         
+data = pd.read_csv('./data/train_crystals.csv')
 # %% Train / test splitting
 target = data['is_centrosymmetric']
 
@@ -45,10 +45,10 @@ pclf.fit(X_train, y_train)
 
 # %% Prediction
 y_pred = pclf.predict(X_test)
-print(f1_(y_test, y_pred))
-# %% plotting
-plt.plot(y_test, y_pred, 'r.')
-plt.show()
-# %% saving
-#np.savetxt('./out/task_2_predictions.csv', y_pred)
+print('f1 score: ', f1_score(y_test, y_pred, average = 'macro'))
+# %% testing     
+test_data = read_descriptors('./data/test_descriptors.csv') 
+test_pred = pclf.predict(test_data)
+#%% saving
+np.savetxt('./out/task_2_predictions.csv', np.bool(test_pred))
 # %%
