@@ -1,5 +1,4 @@
 #%% Imports + Data loading
-from traceback import clear_frames
 import numpy as np
 import matplotlib.pyplot as plt
 import sklearn as sk
@@ -17,7 +16,7 @@ from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error
 from sklearn.svm import SVR
 
-feature_headers = headers = [*pd.read_csv('./data/train_descriptors.csv', nrows=1)]
+headers = [*pd.read_csv('./data/train_descriptors.csv', nrows=1)]
 features = pd.read_csv(
     './data/train_descriptors.csv',
     usecols=[c for c in headers if not c in ['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'SMILES']]
@@ -32,7 +31,7 @@ y_train = y_train.to_numpy()
 pclf = Pipeline([
     ('imputer', SimpleImputer(strategy='mean', verbose=1)),
     ('scaler', MinMaxScaler()),
-    ('feature_sel', SelectKBest(f_regression, k = 10)),
+    ('feature_sel', SelectKBest(f_regression, k = 300)),
     ('fitting', KernelRidge())
 ])
 #%% Fitting
@@ -43,6 +42,12 @@ print(mean_absolute_error(y_test, y_pred))
 #%% plotting
 plt.plot(y_test, y_pred, 'r.')
 plt.show()
+# %%
+test_data = pd.read_csv(
+    './data/test_descriptors.csv',
+    usecols=[c for c in headers if not c in ['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'SMILES']]
+).to_numpy()
+test_pred = pclf.predict(test_data)
 #%% saving
-np.savetxt('./out/task_1_predictions.csv', y_pred)
+np.savetxt('./out/task_1_predictions.csv', test_pred)
 # %%
