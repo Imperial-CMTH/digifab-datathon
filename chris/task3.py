@@ -17,6 +17,7 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error
 from sklearn.svm import SVR
+from sklearn.linear_model import RidgeCV
 
 feature_headers = headers = [*pd.read_csv('../data/train_descriptors.csv', 
                              nrows=1)]
@@ -29,13 +30,13 @@ data = pd.read_csv('../data/train_centroid_distances.csv')
 #%% Train / test splitting
 target = data['mean']
 X_train, X_test, y_train, y_test = train_test_split(
-    features, target, test_size=0.33, random_state=42)
+    features, target, test_size=0.3, random_state=42)
 y_train = y_train.to_numpy()
 # # %% Full model defn as pipeline
 pclf = Pipeline([
     ('imputer', SimpleImputer(strategy='mean', verbose=1)),
     ('scaler', MinMaxScaler()),
-    ('feature_sel', SelectKBest(f_regression, k = 100)),
+    ('feature_sel', SelectKBest(f_regression, k = 1551)), # using it all seems better..!?
     ('fitting', KernelRidge())
 ])
 #%% Fitting
@@ -47,4 +48,4 @@ print("MAE::::::", mean_absolute_error(y_test, y_pred))
 plt.plot(y_test, y_pred, 'r.')
 plt.show()
 #%% saving
-np.savetxt('./out/task_3_predictions.csv', y_pred)
+# np.savetxt('./out/task_3_predictions.csv', y_pred)
