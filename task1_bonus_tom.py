@@ -38,7 +38,7 @@ features = pd.concat([
 
 data = pd.read_csv('./data/train_crystals.csv')
 # %% Train / test splitting
-target = data['is_centrosymmetric']
+target = data['‘packing_coefficient']
 
 X_train, X_test, y_train, y_test = train_test_split(
     features, target, test_size=0.33, random_state=42)
@@ -49,8 +49,8 @@ y_train = y_train.to_numpy()
 pclf = Pipeline([
     ('imputer', SimpleImputer(strategy='mean', verbose=1)),
     ('scaler', MinMaxScaler()),
-    ('feature_sel', SelectKBest(chi2, k = 40)),
-    ('fitting', RandomForestClassifier(random_state=0))
+    ('feature_sel', SelectKBest(f_regression, k = 300)),
+    ('fitting', KernelRidge())
 ])
 # %% Fitting
 pclf.fit(X_train, y_train)
@@ -58,7 +58,7 @@ pclf.fit(X_train, y_train)
 # %% Prediction
 y_pred = pclf.predict(X_test)
 print('f1 score: ', f1_score(y_test, y_pred, average = 'macro'))
-# %% testing     
+# %% testing
 
 test_csvs = glob.glob("./data/test_*.csv")
 tests = {Path(t).stem : pd.read_csv(t) for t in test_csvs}
@@ -72,7 +72,7 @@ test_data = pd.concat([
 
 
 test_pred = pclf.predict(test_data)
-#%% saving
+# %% saving
 with open('./out/task_2_predictions.csv', 'w') as f:
     f.write("\n".join('True' if i else 'False' for i in test_pred))
 # %%
