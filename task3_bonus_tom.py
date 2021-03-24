@@ -45,12 +45,16 @@ X_train, X_test, y_train, y_test = train_test_split(
 
 y_train = y_train.to_numpy()
 
+from sklearn.neighbors import RadiusNeighborsClassifier
+RadiusNeighborsClassifier()
+
 # %% Full model defn as pipeline
 pclf = Pipeline([
     ('imputer', SimpleImputer(strategy='mean', verbose=1)),
     ('scaler', MinMaxScaler()),
-    ('feature_sel', SelectKBest(chi2, k = 200)),
-    ('fitting', RandomForestClassifier(random_state=0))
+    ('feature_sel', SelectKBest(chi2, k = 100)),
+    #('fitting', RandomForestClassifier(random_state=0)),
+    ('fitting', RadiusNeighborsClassifier(radius = 50))
 ])
 # %% Fitting
 pclf.fit(X_train, y_train)

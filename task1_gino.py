@@ -47,6 +47,8 @@ test_data = pd.read_csv(
     './data/test_descriptors.csv',
     usecols=[c for c in headers if not c in ['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'SMILES']]
 ).to_numpy()
+
+pclf.fit(features, target)
 test_pred = pclf.predict(test_data)
 #%% saving
 np.savetxt('./out/task_1_predictions.csv', test_pred)

@@ -32,8 +32,8 @@ def read_descriptors(path):
 features = pd.concat([
     read_descriptors('./data/train_descriptors.csv'),
     #train['train_rdk'].drop('0', axis = 1),
-    #train['train_mord3d'],
-    train['train_mol2vec'],
+    train['train_mord3d'].drop(['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'smiles'], axis = 1),
+    #train['train_mol2vec'],
     ], axis = 1)
 
 data = pd.read_csv('./data/train_crystals.csv')
@@ -49,7 +49,7 @@ y_train = y_train.to_numpy()
 pclf = Pipeline([
     ('imputer', SimpleImputer(strategy='mean', verbose=1)),
     ('scaler', MinMaxScaler()),
-    ('feature_sel', SelectKBest(chi2, k = 40)),
+    ('feature_sel', SelectKBest(chi2, k = 50)),
     ('fitting', RandomForestClassifier(random_state=0))
 ])
 # %% Fitting
@@ -66,8 +66,8 @@ tests = {Path(t).stem : pd.read_csv(t) for t in test_csvs}
 test_data = pd.concat([
     read_descriptors('./data/test_descriptors.csv'),
     #tests['test_rdk'].drop('0', axis = 1),
-    #train['train_mord3d'],
-    tests['test_mol2vec'],
+    tests['test_mord3d'].drop(['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'smiles'], axis = 1),
+    #tests['test_mol2vec'],
     ], axis = 1)
 
 pclf.fit(features, target)
