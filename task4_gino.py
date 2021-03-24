@@ -15,7 +15,6 @@ from sklearn.kernel_ridge import KernelRidge
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_absolute_error
-from sklearn.svm import SVR
 
 feature_descriptors_headers = [*pd.read_csv('./data/train_descriptors.csv', nrows=1)]
 features_descriptors = pd.read_csv(
@@ -55,15 +54,15 @@ plt.show()
 
 test_descriptors_headers = [*pd.read_csv('./data/test_descriptors.csv', nrows=1)]
 test_descriptors = pd.read_csv(
-    './data/train_descriptors.csv',
+    './data/test_descriptors.csv',
     usecols=[c for c in test_descriptors_headers if not c in ['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'SMILES']]
 )
 test_mord3d_headers = [*pd.read_csv('./data/test_mord3d.csv', nrows=1)]
 test_mord3d = pd.read_csv(
-    './data/train_mord3d.csv',
+    './data/test_mord3d.csv',
     usecols=[c for c in test_mord3d_headers if not c in ['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'smiles']]
 )
-test_features = pd.concat((features_descriptors, features_mord3d), axis=1)
+test_features = pd.concat((test_descriptors, test_mord3d), axis=1)
 test_pred = pclf.predict(test_features)
 #%% saving
 np.savetxt('./out/task_4_predictions.csv', test_pred)
