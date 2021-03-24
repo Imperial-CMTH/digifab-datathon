@@ -36,7 +36,7 @@ y_train = y_train.to_numpy()
 pclf = Pipeline([
     ('imputer', SimpleImputer(strategy='mean', verbose=1)),
     ('scaler', MinMaxScaler()),
-    ('feature_sel', SelectKBest(f_regression, k = 1551)), # using it all seems better..!?
+    ('feature_sel', SelectKBest(f_regression, k = 1551)), # using it all seems better..!?   
     ('fitting', KernelRidge())
 ])
 #%% Fitting
@@ -48,4 +48,10 @@ print("MAE::::::", mean_absolute_error(y_test, y_pred))
 plt.plot(y_test, y_pred, 'r.')
 plt.show()
 #%% saving
-# np.savetxt('./out/task_3_predictions.csv', y_pred)
+test_data = pd.read_csv(
+    '../data/test_descriptors.csv',
+    usecols=[c for c in headers if not c in [
+        'identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'SMILES']]
+).to_numpy()
+test_pred = pclf.predict(test_data)
+np.savetxt('task_3_predictions.csv', test_pred)
