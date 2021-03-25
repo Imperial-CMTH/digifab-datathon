@@ -39,8 +39,8 @@ def read_descriptors(path):
 features = pd.concat([
     read_descriptors('./data/train_descriptors.csv'),
     #train['train_rdk'].drop('0', axis = 1),
-    train['train_mord3d'].drop(['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'smiles'], axis = 1),
-    #train['train_mol2vec'],
+    #train['train_mord3d'].drop(['identifiers', 'Unnamed: 0', 'name', 'InchiKey', 'smiles'], axis = 1),
+    train['train_mol2vec'],
     ], axis = 1)
 
 data = pd.read_csv('./data/train_crystals.csv')
@@ -53,32 +53,33 @@ X_train, X_test, y_train, y_test = train_test_split(
 y_train = y_train.to_numpy()
 
 #clf = ExtraTreesClassifier(n_estimators=n_estimators, max_features="sqrt",  n_jobs=-1)
-clf = RandomForestClassifier(min_samples_split=2, n_jobs=-1)
+clf = RandomForestClassifier(min_samples_split=2, n_jobs=-1, max_features = 'sqrt', n_estimators = 200)
 
 # %% Full model defn as pipeline
 pclf = Pipeline([
     ('imputer', SimpleImputer(strategy='mean', verbose=0)),
     ('scaler', MinMaxScaler()),
-    ('feature_sel', SelectKBest(chi2, k = 50)),
+    ('feature_sel', SelectKBest(chi2, k = 100)),
     ('fitting', clf),
-])
+], memory = './cachdir', )
 
 tuner = GridSearchCV(estimator = pclf,
                      param_grid = dict(
-                         fitting__max_features = [None, 'sqrt'],
-                         feature_sel__k = [10,20,50,100,200],
-                         fitting__n_estimators = [100,150,200,250],
+                         fitting__max_features = ['sqrt'],
+                         feature_sel__k = [80,90,100],
+                         fitting__n_estimators = [100,150,200],
                                       ),
                      scoring = 'f1_macro',
                      n_jobs=-1,
                      refit=True, verbose=4)
 
-# %% Fitting
-print('Fitting')
-tuner.fit(X_train, y_train)
-print(tuner.best_score_, tuner.best_params_)
+# %% Tuning
+#print('Tuning')
+#tuner.fit(features, target)
+#print(tuner.best_score_, tuner.best_params_)
 
 # %% Prediction
+pclf.fit(X_train, y_train)
 y_pred = pclf.predict(X_test)
 print('f1 score: ', f1_score(y_test, y_pred, average = 'macro')) 
 
