@@ -10,7 +10,7 @@ We won the datathon with [scikit-learn][Sklearn] by focussing on back-to-basics 
 [SKlearn]: https://scikit-learn.org/stable/
 
 
-[Tom]: thomashodson.com
+[Tom]: https://thomashodson.com
 [Milan]: https://github.com/mbrakic
 [Peru]: https://github.com/dpreuo
 [Gino]: https://github.com/gcassella
